@@ -1,4 +1,4 @@
-package org.ow2.proactive.microservice_template.repository;
+package eu.audren.mael.repository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
