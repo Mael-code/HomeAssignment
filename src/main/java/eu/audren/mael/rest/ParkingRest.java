@@ -3,11 +3,7 @@ package eu.audren.mael.rest;
 import eu.audren.mael.model.Parking;
 import eu.audren.mael.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,5 +22,10 @@ public class ParkingRest {
     @RequestMapping(method = RequestMethod.POST)
     public Parking createParking(@RequestBody Parking newParking){
         return parkingService.createParking(newParking);
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, path ="{id}")
+    public Parking deleteParking(@PathVariable long id){
+        return parkingService.deleteParking(id);
     }
 }

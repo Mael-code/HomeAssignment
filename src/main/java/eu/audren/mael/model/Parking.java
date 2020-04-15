@@ -11,6 +11,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -22,7 +23,7 @@ public class Parking {
     @Column(name="ID")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PARKING_SEQUENCE")
     @SequenceGenerator(name = "PARKING_SEQUENCE", sequenceName = "PARKING_SEQUENCE")
-    @JsonIgnore
+    @JsonProperty
     private long id;
 
     @Column(name = "STANDARDS_SLOTS")

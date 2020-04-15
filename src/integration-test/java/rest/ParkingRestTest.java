@@ -1,6 +1,7 @@
 package rest;
 
 import eu.audren.mael.Application;
+import eu.audren.mael.exception.ResourceNotFound;
 import eu.audren.mael.model.Parking;
 import eu.audren.mael.model.pricing.PerHoursPolicy;
 import eu.audren.mael.model.pricing.PricingPolicy;
@@ -53,4 +54,29 @@ public class ParkingRestTest {
         assertThat(createdParking.getElectricSlots50Kw()).isEqualTo(electricSlots50Kw);
         assertThat(createdParking.getPricingPolicy()).isEqualTo(pricingPolicy);
     }
+
+    @Test
+    public void deleteParkingTest(){
+        final int standardSlots = 2;
+        final int electricSlots20Kw = 3;
+        final int electricSlots50Kw = 4;
+        final PricingPolicy pricingPolicy = new PerHoursPolicy(5);
+
+        Parking newParking = parkingRest.createParking(new Parking(standardSlots,electricSlots20Kw,electricSlots50Kw,pricingPolicy));
+
+        Parking deletedParking = parkingRest.deleteParking(newParking.getId());
+        assertThat(deletedParking.getId()).isEqualTo(newParking.getId());
+        assertThat(deletedParking.getStandardSlots()).isEqualTo(standardSlots);
+        assertThat(deletedParking.getElectricSlots20Kw()).isEqualTo(electricSlots20Kw);
+        assertThat(deletedParking.getElectricSlots50Kw()).isEqualTo(electricSlots50Kw);
+        assertThat(deletedParking.getPricingPolicy()).isEqualTo(pricingPolicy);
+    }
+
+    @Test(expected = ResourceNotFound.class)
+    public void deleteParkingNotFound(){
+        parkingRest.deleteParking(1);
+    }
+
+
+
 }
