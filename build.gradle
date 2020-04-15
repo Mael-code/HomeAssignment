@@ -37,7 +37,6 @@ bootRepackage {
 }
 
 configurations {
-    // The following module is excluded to avoid clashes when embedded inside the ProActive Scheduler
     all*.exclude module: 'spring-boot-starter-logging'
 
     integrationTestCompile.extendsFrom testCompile

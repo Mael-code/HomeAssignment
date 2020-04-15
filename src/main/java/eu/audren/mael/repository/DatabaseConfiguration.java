@@ -65,15 +65,8 @@ public class DatabaseConfiguration {
     }
 
     private String getDatabaseDirectory() {
-        String proactiveHome = System.getProperty("proactive.home");
-
-        if (proactiveHome == null) {
-            return System.getProperty("java.io.tmpdir") + File.separator
-                    + "proactive" + File.separator + "microservice-template";
-        }
-
-        return proactiveHome + File.separator + "data"
-                + File.separator + "db" + File.separator + "microservice-template";
+        return File.separator + "data"
+                + File.separator + "db" + File.separator + "home-assignment";
     }
 
 }
