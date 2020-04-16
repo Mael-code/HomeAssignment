@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.audren.mael.model.pricing.PricingPolicy;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
@@ -16,6 +15,8 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Entity(name = "PARKING")
 @Table(name = "PARKING")
 public class Parking {
@@ -27,32 +28,35 @@ public class Parking {
     @SequenceGenerator(name = "PARKING_SEQUENCE", sequenceName = "PARKING_SEQUENCE")
     private long id;
 
-    @JsonProperty
+    @JsonProperty(required = true)
     @Column(name = "STANDARDS_SLOTS")
     private int standardSlots;
 
-    @JsonProperty
+    @JsonProperty(required = true)
     @Column(name = "ELECTRIC_SLOTS_20KW")
     private int electricSlots20Kw;
 
-    @JsonProperty
+    @JsonProperty(required = true)
     @Column(name = "ELECTRIC_SLOTS_50KW")
     private int electricSlots50Kw;
 
-    @JsonProperty
+    @JsonProperty(required = true)
     @Column(name = "PRICING_POLICY")
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     private PricingPolicy pricingPolicy;
 
     @JsonIgnore
+    @Setter
     @OneToMany(mappedBy = "immatriculation", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<Car> standardsSlotsUsed;
 
     @JsonIgnore
+    @Setter
     @OneToMany(mappedBy = "immatriculation", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<Car> electricSlots20KwUsed;
 
     @JsonIgnore
+    @Setter
     @OneToMany(mappedBy = "immatriculation", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<Car> electricSlots50KwUsed;
 

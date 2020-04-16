@@ -1,8 +1,6 @@
 package eu.audren.mael.rest;
 
-import eu.audren.mael.model.Car;
 import eu.audren.mael.model.Parking;
-import eu.audren.mael.model.SlotType;
 import eu.audren.mael.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -1,16 +1,15 @@
 package eu.audren.mael.service;
 
+import eu.audren.mael.exception.DuplicateCarException;
 import eu.audren.mael.exception.ResourceNotFound;
 import eu.audren.mael.model.Car;
 import eu.audren.mael.model.Parking;
-import eu.audren.mael.model.SlotType;
 import eu.audren.mael.repository.CarRepository;
 import eu.audren.mael.repository.ParkingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -32,20 +31,23 @@ public class ParkingService {
 
     @Transactional
     public Parking deleteParking(long id){
-        isParkingExisting(id);
+        checkThatParkingExists(id);
         return deleteParkingInRepository(id);
     }
 
+    @Transactional
     public Car parkCar(Car car){
-        isParkingExisting(car.getParkingId());
-        isCarExisting(car.getImmatriculation());
+        checkThatParkingExists(car.getParkingId());
+        checkThatCarIsNotParked(car.getImmatriculation());
         return parkCarInRepository(car);
     }
 
+    @Transactional
     public Car leaveSlot(String immatriculation){
-        isCarExisting(immatriculation);
+        checkThatCarIsParked(immatriculation);
         Car car = carRepository.findOneByImmatriculation(immatriculation);
         carRepository.deleteByImmatriculation(immatriculation);
+        car.setDepartureTime(System.currentTimeMillis());
         return car;
     }
 
@@ -55,7 +57,6 @@ public class ParkingService {
         return parkingToDelete;
     }
 
-    @Transactional
     private Car parkCarInRepository(Car car){
         Parking parking = parkingRepository.getOne(car.getParkingId());
         car.setParkingUsed(parking);
@@ -65,23 +66,29 @@ public class ParkingService {
                 parking.getStandardsSlotsUsed().add(car);
                 break;
             case ELECTRIC_20KW:
-                parking.getStandardsSlotsUsed().add(car);
+                parking.getElectricSlots20KwUsed().add(car);
                 break;
             case ELECTRIC_50KW:
-                parking.getStandardsSlotsUsed().add(car);
+                parking.getElectricSlots50KwUsed().add(car);
                 break;
         }
         parkingRepository.save(parking);
         return car;
     }
 
-    private void isCarExisting(String immatriculation){
-        if (! carRepository.existsCarByImmatriculation(immatriculation)){
-            throw new ResourceNotFound(String.format("Parking with the id %s was not found",immatriculation));
+    private void checkThatCarIsNotParked(String immatriculation){
+        if (carRepository.existsCarByImmatriculation(immatriculation)){
+            throw new DuplicateCarException(String.format("The car %s is already registered",immatriculation));
         }
     }
 
-    private void isParkingExisting(long parkingId){
+    private void checkThatCarIsParked(String immatriculation){
+        if (! carRepository.existsCarByImmatriculation(immatriculation)){
+            throw new ResourceNotFound(String.format("The car with the immatriculation %s is not parked",immatriculation));
+        }
+    }
+
+    private void checkThatParkingExists(long parkingId){
         if (! parkingRepository.exists(parkingId)){
             throw new ResourceNotFound(String.format("Parking with the id %s was not found",parkingId));
         }

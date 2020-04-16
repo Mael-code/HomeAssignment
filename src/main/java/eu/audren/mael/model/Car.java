@@ -1,13 +1,16 @@
 package eu.audren.mael.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "immatriculation")
 @Entity(name = "CAR")
 @Table(name = "CAR")
 public class Car {
@@ -15,16 +18,12 @@ public class Car {
     @JsonProperty
     @Id
     @Column(name = "IMMATRICULATION")
-    private final String immatriculation;
-
-    @JsonProperty
-    @Column(name = "ARRIVAL_TIME")
-    private final long arrivalTime;
+    private String immatriculation;
 
     @JsonProperty
     @Column(name = "SLOT_TYPE")
     @Enumerated(EnumType.STRING)
-    private final SlotType slotType;
+    private SlotType slotType;
 
     @Setter
     @JsonIgnore
@@ -32,11 +31,16 @@ public class Car {
     @JoinColumn(name = "CAR_IMMATRICULATION")
     private Parking parkingUsed;
 
+    @JsonProperty
+    @Column(name = "ARRIVAL_TIME")
+    private long arrivalTime;
+
     @Setter
     @JsonProperty
     private long departureTime;
 
-    public Car(String immatriculation, long parkingId, SlotType slotType){
+    @JsonCreator
+    public Car(@JsonProperty("immatriculation") String immatriculation, @JsonProperty("parkingId") long parkingId,@JsonProperty("slotType") SlotType slotType){
         this.immatriculation = immatriculation;
         this.parkingUsed = new Parking(parkingId);
         this.slotType = slotType;
@@ -51,14 +55,15 @@ public class Car {
     @JsonProperty(value = "bill")
     public float getBill(){
         if(departureTime!=0) {
-            return parkingUsed.getPricingPolicy().getPricing(convertMilliSecondsToHour(arrivalTime - departureTime));
+            return parkingUsed.getPricingPolicy().getPricing(convertMilliSecondsToHour(departureTime - arrivalTime));
         }else {
             return 0;
         }
     }
 
     private float convertMilliSecondsToHour(long duration){
-        return duration/1000*60*60;
+        final long oneHour = 1000*60*60;
+        return (float) duration/ (float) oneHour;
     }
 
 }
