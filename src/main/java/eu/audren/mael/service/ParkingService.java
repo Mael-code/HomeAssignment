@@ -2,14 +2,17 @@ package eu.audren.mael.service;
 
 import eu.audren.mael.exception.DuplicateCarException;
 import eu.audren.mael.exception.ResourceNotFound;
+import eu.audren.mael.exception.ServerException;
 import eu.audren.mael.model.Car;
 import eu.audren.mael.model.Parking;
+import eu.audren.mael.model.SlotType;
 import eu.audren.mael.repository.CarRepository;
 import eu.audren.mael.repository.ParkingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -59,21 +62,25 @@ public class ParkingService {
 
     private Car parkCarInRepository(Car car){
         Parking parking = parkingRepository.getOne(car.getParkingId());
+        checkRemainingSlots(parking,car);
         car.setParkingUsed(parking);
         car = carRepository.save(car);
-        switch (car.getSlotType()){
-            case STANDARDS:
-                parking.getStandardsSlotsUsed().add(car);
-                break;
-            case ELECTRIC_20KW:
-                parking.getElectricSlots20KwUsed().add(car);
-                break;
-            case ELECTRIC_50KW:
-                parking.getElectricSlots50KwUsed().add(car);
-                break;
-        }
+        getParkingSlots(parking,car.getSlotType()).add(car);
         parkingRepository.save(parking);
         return car;
+    }
+
+    private List<Car> getParkingSlots(Parking parking, SlotType slotType){
+        switch (slotType){
+            case STANDARDS:
+                return parking.getStandardsSlotsUsed();
+            case ELECTRIC_20KW:
+                return parking.getElectricSlots20KwUsed();
+            case ELECTRIC_50KW:
+                return parking.getElectricSlots50KwUsed();
+            default:
+                throw new ServerException(String.format("The slot type %s is unknown",slotType.name()));
+        }
     }
 
     private void checkThatCarIsNotParked(String immatriculation){
@@ -93,4 +100,32 @@ public class ParkingService {
             throw new ResourceNotFound(String.format("Parking with the id %s was not found",parkingId));
         }
     }
+
+    private void checkRemainingSlots(Parking parking, Car car){
+        int slotsUsed;
+        int slotNumber;
+        switch (car.getSlotType()){
+            case STANDARDS:
+                slotsUsed = parking.getStandardsSlotsUsed().size();
+                slotNumber = parking.getStandardSlots();
+                break;
+            case ELECTRIC_20KW:
+                slotsUsed = parking.getElectricSlots20KwUsed().size();
+                slotNumber = parking.getElectricSlots20Kw();
+                break;
+            case ELECTRIC_50KW:
+                slotsUsed = parking.getElectricSlots50KwUsed().size();
+                slotNumber = parking.getElectricSlots50Kw();
+                break;
+            default:
+                throw new ServerException(String.format("The slot type %s is unknown",car.getSlotType().name()));
+        }
+        if (slotsUsed>=slotNumber){
+            throw new DuplicateCarException(String.format("Slots %s are not available anymore for the parking %s",
+                    car.getSlotType().name(),
+                    parking.getId()));
+        }
+
+    }
+
 }

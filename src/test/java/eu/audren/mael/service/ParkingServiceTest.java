@@ -100,4 +100,21 @@ public class ParkingServiceTest {
         when(parkingRepository.exists(existingParking)).thenReturn(true);
         parkingService.parkCar(new Car(existingImmatriculation,existingParking, SlotType.ELECTRIC_20KW));
     }
+
+    @Test(expected = DuplicateCarException.class)
+    public void testThatCarDoNotParkWhenAllSlotsAreTaken(){
+        long parkingId = 1L;
+        Car carToPark = new Car("immatriculation",parkingId,SlotType.ELECTRIC_50KW);
+        Parking savedParking = new Parking(parkingId,1,1,0,new PerHoursPolicy(1),new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+
+        Car parkedCar = new Car("immatriculation",parkingId,SlotType.STANDARDS);
+        parkedCar.setParkingUsed(savedParking);
+
+        when(parkingRepository.exists(parkingId)).thenReturn(true);
+        when(carRepository.existsCarByImmatriculation(carToPark.getImmatriculation())).thenReturn(false);
+        when(parkingRepository.getOne(parkingId)).thenReturn(savedParking);
+
+        parkingService.parkCar(carToPark);
+    }
+
 }
