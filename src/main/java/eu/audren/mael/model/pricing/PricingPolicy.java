@@ -14,5 +14,5 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public abstract class PricingPolicy implements Serializable {
 
-    public abstract int getPricing(int numberOfHoursSpent);
+    public abstract float getPricing(float numberOfHoursSpent);
 }

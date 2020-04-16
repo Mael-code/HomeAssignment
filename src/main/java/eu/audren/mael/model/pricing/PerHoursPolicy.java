@@ -20,7 +20,7 @@ public class PerHoursPolicy extends PricingPolicy {
     }
 
     @Override
-    public int getPricing(int numberOfHoursSpent) {
+    public float getPricing(float numberOfHoursSpent) {
         return numberOfHoursSpent*hourPrice;
     }
 }

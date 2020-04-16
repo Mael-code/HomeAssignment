@@ -1,6 +1,8 @@
 package eu.audren.mael.rest;
 
+import eu.audren.mael.model.Car;
 import eu.audren.mael.model.Parking;
+import eu.audren.mael.model.SlotType;
 import eu.audren.mael.service.ParkingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -8,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/parking/")
+@RequestMapping(path = "/parking/")
 public class ParkingRest {
 
     @Autowired

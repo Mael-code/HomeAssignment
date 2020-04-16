@@ -24,7 +24,7 @@ public class FixedAmountPolicy extends PricingPolicy {
     }
 
     @Override
-    public int getPricing(int numberOfHoursSpent) {
+    public float getPricing(float numberOfHoursSpent) {
         return fixedAmount+hourPrice*numberOfHoursSpent;
     }
 }
