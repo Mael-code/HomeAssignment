@@ -2,10 +2,12 @@ package eu.audren.mael.service;
 
 import eu.audren.mael.exception.DuplicateCarException;
 import eu.audren.mael.exception.ResourceNotFound;
+import eu.audren.mael.model.Bill;
 import eu.audren.mael.model.Car;
 import eu.audren.mael.model.Parking;
 import eu.audren.mael.model.SlotType;
 import eu.audren.mael.model.pricing.PerHoursPolicy;
+import eu.audren.mael.repository.BillRepository;
 import eu.audren.mael.repository.CarRepository;
 import eu.audren.mael.repository.ParkingRepository;
 import org.junit.Test;
@@ -17,7 +19,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ParkingServiceTest {
@@ -27,6 +29,9 @@ public class ParkingServiceTest {
 
     @Mock
     private ParkingRepository parkingRepository;
+
+    @Mock
+    private BillRepository billRepository;
 
     @Mock
     private CarRepository carRepository;
@@ -75,6 +80,8 @@ public class ParkingServiceTest {
         assertThat(leavingCar.getArrivalTime()).isEqualTo(arrivalTime);
         assertThat(leavingCar.getDepartureTime()).isNotEqualTo(0L);
         assertThat(leavingCar.getBill()).isNotWithin(0.1f).of(0f);
+
+        verify(billRepository,times(1)).save(new Bill(parkedCar));
 
     }
 

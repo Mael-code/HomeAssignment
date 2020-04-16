@@ -3,9 +3,11 @@ package eu.audren.mael.service;
 import eu.audren.mael.exception.DuplicateCarException;
 import eu.audren.mael.exception.ResourceNotFound;
 import eu.audren.mael.exception.ServerException;
+import eu.audren.mael.model.Bill;
 import eu.audren.mael.model.Car;
 import eu.audren.mael.model.Parking;
 import eu.audren.mael.model.SlotType;
+import eu.audren.mael.repository.BillRepository;
 import eu.audren.mael.repository.CarRepository;
 import eu.audren.mael.repository.ParkingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class ParkingService {
 
     @Autowired
     private CarRepository carRepository;
+
+    @Autowired
+    private BillRepository billRepository;
 
     public Parking createParking(Parking newParking){
         return parkingRepository.save(newParking);
@@ -51,6 +56,7 @@ public class ParkingService {
         Car car = carRepository.findOneByImmatriculation(immatriculation);
         carRepository.deleteByImmatriculation(immatriculation);
         car.setDepartureTime(System.currentTimeMillis());
+        billRepository.save(new Bill(car));
         return car;
     }
 
