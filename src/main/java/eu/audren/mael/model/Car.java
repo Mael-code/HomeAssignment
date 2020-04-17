@@ -7,6 +7,9 @@ import lombok.*;
 
 import javax.persistence.*;
 
+/**
+ * The car representation
+ */
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -52,6 +55,10 @@ public class Car {
         return parkingUsed.getId();
     }
 
+    /**
+     * Compute the bill when the departure time is set according to the parking price policy
+     * @return the computed the bill if the car left the slot otherwise return 0
+     */
     @JsonProperty(value = "bill")
     public float getBill(){
         if(departureTime!=0) {

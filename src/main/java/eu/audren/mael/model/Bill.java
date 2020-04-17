@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+/**
+ * The bill representation contains all the payment information
+ */
 @NoArgsConstructor
 @EqualsAndHashCode
 @Getter

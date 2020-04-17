@@ -13,6 +13,9 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The parking representation contains the parking properties and the car parked
+ */
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

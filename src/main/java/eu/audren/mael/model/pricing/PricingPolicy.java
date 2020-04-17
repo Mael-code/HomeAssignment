@@ -6,6 +6,9 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
+/**
+ * An abstract visualization of the pricing policy enabling to easily create new pricing policies
+ */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "policy")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = PerHoursPolicy.class, name="perHours"),
@@ -14,5 +17,10 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public abstract class PricingPolicy implements Serializable {
 
+    /**
+     * Compute the parking price according to the time spent
+     * @param numberOfHoursSpent the time spent in the parking slot
+     * @return the price for the time spent
+     */
     public abstract float getPricing(float numberOfHoursSpent);
 }

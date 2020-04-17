@@ -11,10 +11,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Optional;
 
+/**
+ * The class intends to catch all exceptions and return them to the client as a wrapped error message
+ * The wrapped error message is contained in a ResponseEntity with the correct http code
+ */
 @Log4j2
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 
+    /**
+     * Automatically catch client exception thrown and return a client error to the user
+     * @param exception is the exception caught
+     * @return Response entity containing the http status code and the error message
+     * @throws Exception is thrown if the annotation status cannot be solved
+     */
     @ExceptionHandler(ClientException.class)
     public ResponseEntity clientErrorHandler(ClientException exception) throws Exception {
         log.warn("Exception: " + exception.getLocalizedMessage());

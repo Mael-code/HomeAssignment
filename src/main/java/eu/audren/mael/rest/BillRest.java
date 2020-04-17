@@ -17,6 +17,10 @@ public class BillRest {
     @Autowired
     private BillRepository billRepository;
 
+    /**
+     * Get request to gather all persisted bills
+     * @return the list of all bills
+     */
     @RequestMapping(method = RequestMethod.GET)
     public List<Bill> getAllBills(){
         return billRepository.findAll();
