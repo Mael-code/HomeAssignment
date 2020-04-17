@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -11,17 +12,18 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.Optional;
 
 @Log4j2
+@ControllerAdvice
 public class ExceptionHandlerAdvice {
 
     @ExceptionHandler(ClientException.class)
-    public ResponseEntity clientErrorHandler(Exception exception) throws Exception {
+    public ResponseEntity clientErrorHandler(ClientException exception) throws Exception {
         log.warn("Exception: " + exception.getLocalizedMessage());
 
         HttpStatus responseStatusCode = resolveAnnotatedResponseStatus(exception);
 
         return ResponseEntity.status(responseStatusCode)
                 .body(new ErrorMessage(responseStatusCode.value(),
-                        exception.getLocalizedMessage()));
+                        exception.getErrorMessage()));
     }
 
     /**
