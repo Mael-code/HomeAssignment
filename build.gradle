@@ -45,29 +45,15 @@ compileJava {
     targetCompatibility = 1.8
 }
 
-ext {
-    generatedSrcDir = "$projectDir/src/generated/java"
-}
-
 repositories {
     jcenter()
 }
 
 sourceSets {
-    generated {
-        java {
-            srcDirs += generatedSrcDir
-        }
-    }
-
-    main {
-        java {
-            srcDirs += generatedSrcDir
-        }
-    }
 
     integrationTest {
-        java.srcDir file('src/integration-test/java')
+        java.srcDir file('src/integrationTest/java')
+        resources.srcDir file('src/integrationTest/resources')
 
         compileClasspath = sourceSets.main.output + configurations.integrationTestCompile
         runtimeClasspath = output + compileClasspath + configurations.integrationTestRuntime
@@ -111,21 +97,17 @@ dependencies {
 
 }
 
-task integrationTest(type: Test) {
+def integrationTest = tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
-    classpath += sourceSets.test.runtimeClasspath
-
-    jacoco {
-        destinationFile = file("$buildDir/jacoco/jacocoIntegrationTest.exec")
-    }
-
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
+    shouldRunAfter('test')
 }
 
 jacocoTestReport {
-    executionData test, integrationTest
+    executionData test
 
     sourceSets project.sourceSets.main
 
@@ -134,14 +116,6 @@ jacocoTestReport {
         html.destination file("${buildDir}/jacocoHtml")
     }
 }
-
-clean {
-    sourceSets.generated.java.srcDirs.each {
-       srcDir -> delete srcDir
-    }
-}
-
-check.dependsOn integrationTest
 
 sonarqube {
     properties {
@@ -153,7 +127,8 @@ sonarqube {
 
 idea {
     module {
-        testSourceDirs += file('src/integration-test/java')
+        testSourceDirs += file('src/integrationTest/java')
+        testSourceDirs += file('src/integrationTest/resources')
 
         scopes.TEST.plus += [
                 configurations.integrationTestCompile,

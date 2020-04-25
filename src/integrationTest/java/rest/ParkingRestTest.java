@@ -23,7 +23,7 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 @ActiveProfiles("test")
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { Application.class })
+@ContextConfiguration(classes = {Application.class})
 @WebAppConfiguration
 public class ParkingRestTest {
 
@@ -34,18 +34,18 @@ public class ParkingRestTest {
     private ParkingRest parkingRest;
 
     @Before
-    public void cleanDatabase(){
+    public void cleanDatabase() {
         parkingRepository.deleteAll();
     }
 
     @Test
-    public void createParkingTest(){
+    public void createParkingTest() {
         final int standardSlots = 2;
         final int electricSlots20Kw = 3;
         final int electricSlots50Kw = 4;
         final PricingPolicy pricingPolicy = new PerHoursPolicy(5);
 
-        Parking newParking = new Parking(standardSlots,electricSlots20Kw,electricSlots50Kw,pricingPolicy);
+        Parking newParking = new Parking(standardSlots, electricSlots20Kw, electricSlots50Kw, pricingPolicy);
         Parking createdParking = parkingRest.createParking(newParking);
         assertThat(createdParking).isNotNull();
         assertThat(createdParking.getId()).isNotNull();
@@ -56,13 +56,13 @@ public class ParkingRestTest {
     }
 
     @Test
-    public void deleteParkingTest(){
+    public void deleteParkingTest() {
         final int standardSlots = 2;
         final int electricSlots20Kw = 3;
         final int electricSlots50Kw = 4;
         final PricingPolicy pricingPolicy = new PerHoursPolicy(5);
 
-        Parking newParking = parkingRest.createParking(new Parking(standardSlots,electricSlots20Kw,electricSlots50Kw,pricingPolicy));
+        Parking newParking = parkingRest.createParking(new Parking(standardSlots, electricSlots20Kw, electricSlots50Kw, pricingPolicy));
 
         Parking deletedParking = parkingRest.deleteParking(newParking.getId());
         assertThat(deletedParking.getId()).isEqualTo(newParking.getId());
@@ -73,10 +73,9 @@ public class ParkingRestTest {
     }
 
     @Test(expected = ResourceNotFound.class)
-    public void deleteParkingNotFound(){
+    public void deleteParkingNotFound() {
         parkingRest.deleteParking(1);
     }
-
 
 
 }
