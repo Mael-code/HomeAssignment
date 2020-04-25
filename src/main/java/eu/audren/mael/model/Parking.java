@@ -18,7 +18,6 @@ import java.util.List;
  */
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Entity(name = "PARKING")
 @Table(name = "PARKING")
@@ -75,6 +74,14 @@ public class Parking {
         this.standardsSlotsUsed = new ArrayList<>();
         this.electricSlots50KwUsed = new ArrayList<>();
         this.electricSlots20KwUsed = new ArrayList<>();
+    }
+
+    public Parking(long id, int standardSlots,
+                   int electricSlots20Kw,
+                   int electricSlots50Kw,
+                   PricingPolicy pricingPolicy){
+        this(standardSlots,electricSlots20Kw,electricSlots50Kw,pricingPolicy);
+        this.id = id;
     }
 
     public Parking(long id){

@@ -12,7 +12,6 @@ import javax.persistence.*;
  */
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(of = "immatriculation")
 @Entity(name = "CAR")
 @Table(name = "CAR")
@@ -48,6 +47,14 @@ public class Car {
         this.parkingUsed = new Parking(parkingId);
         this.slotType = slotType;
         this.arrivalTime = System.currentTimeMillis();
+    }
+
+    public Car(String immatriculation, SlotType slotType, Parking parking, long arrivalTime, long departureTime) {
+        this.immatriculation = immatriculation;
+        this.slotType = slotType;
+        this.parkingUsed = parking;
+        this.arrivalTime = arrivalTime;
+        this.departureTime = departureTime;
     }
 
     @JsonProperty(value = "parkingId")

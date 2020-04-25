@@ -86,7 +86,7 @@ public class ParkingService {
 
     private Parking deleteParkingInRepository(long id){
         Parking parkingToDelete = parkingRepository.getOne(id);
-        parkingRepository.delete(id);
+        parkingRepository.deleteById(id);
         return parkingToDelete;
     }
 
@@ -126,7 +126,7 @@ public class ParkingService {
     }
 
     private void checkThatParkingExists(long parkingId){
-        if (! parkingRepository.exists(parkingId)){
+        if (! parkingRepository.existsById(parkingId)){
             throw new ResourceNotFound(String.format("Parking with the id %s was not found",parkingId));
         }
     }

@@ -40,12 +40,12 @@ public class ParkingServiceTest {
     public void parkCarTest(){
         long parkingId = 1L;
         Car carToPark = new Car("immatriculation",parkingId,SlotType.STANDARDS);
-        Parking savedParking = new Parking(parkingId,1,1,1,new PerHoursPolicy(1),new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+        Parking savedParking = new Parking(parkingId,1,1,1,new PerHoursPolicy(1));
 
         Car parkedCar = new Car("immatriculation",parkingId,SlotType.STANDARDS);
         parkedCar.setParkingUsed(savedParking);
 
-        when(parkingRepository.exists(parkingId)).thenReturn(true);
+        when(parkingRepository.existsById(parkingId)).thenReturn(true);
         when(carRepository.existsCarByImmatriculation(carToPark.getImmatriculation())).thenReturn(false);
         when(parkingRepository.getOne(parkingId)).thenReturn(savedParking);
         when(carRepository.save(parkedCar)).thenReturn(parkedCar);
@@ -66,8 +66,8 @@ public class ParkingServiceTest {
         String immatriculation = "immatriculation";
         long parkingId = 1L;
         long arrivalTime = 0L;
-        Parking savedParking = new Parking(parkingId,1,1,1,new PerHoursPolicy(1),new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
-        Car parkedCar = new Car(immatriculation ,SlotType.ELECTRIC_50KW, savedParking, arrivalTime,0);
+        Parking savedParking = new Parking(parkingId,1,1,1,new PerHoursPolicy(1));
+        Car parkedCar = new Car(immatriculation ,SlotType.ELECTRIC_50KW, savedParking, arrivalTime,0L);
 
         when(carRepository.existsCarByImmatriculation(immatriculation)).thenReturn(true);
         when(carRepository.findOneByImmatriculation(immatriculation)).thenReturn(parkedCar);
@@ -88,14 +88,14 @@ public class ParkingServiceTest {
     @Test(expected = ResourceNotFound.class)
     public void deleteParkingWithBadId(){
         long badId = 1;
-        when(parkingRepository.exists(badId)).thenReturn(false);
+        when(parkingRepository.existsById(badId)).thenReturn(false);
         parkingService.deleteParking(badId);
     }
 
     @Test(expected = ResourceNotFound.class)
     public void parkCarTestWithBadParkingId(){
         long badId = 1;
-        when(parkingRepository.exists(badId)).thenReturn(false);
+        when(parkingRepository.existsById(badId)).thenReturn(false);
         parkingService.parkCar(new Car("immatriculation",badId, SlotType.ELECTRIC_20KW));
     }
 
@@ -104,7 +104,7 @@ public class ParkingServiceTest {
         String existingImmatriculation = "badImmatriculation";
         long existingParking = 1L;
         when(carRepository.existsCarByImmatriculation(existingImmatriculation)).thenReturn(true);
-        when(parkingRepository.exists(existingParking)).thenReturn(true);
+        when(parkingRepository.existsById(existingParking)).thenReturn(true);
         parkingService.parkCar(new Car(existingImmatriculation,existingParking, SlotType.ELECTRIC_20KW));
     }
 
@@ -112,12 +112,12 @@ public class ParkingServiceTest {
     public void testThatCarDoNotParkWhenAllSlotsAreTaken(){
         long parkingId = 1L;
         Car carToPark = new Car("immatriculation",parkingId,SlotType.ELECTRIC_50KW);
-        Parking savedParking = new Parking(parkingId,1,1,0,new PerHoursPolicy(1),new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+        Parking savedParking = new Parking(parkingId,1,1,0,new PerHoursPolicy(1));
 
         Car parkedCar = new Car("immatriculation",parkingId,SlotType.STANDARDS);
         parkedCar.setParkingUsed(savedParking);
 
-        when(parkingRepository.exists(parkingId)).thenReturn(true);
+        when(parkingRepository.existsById(parkingId)).thenReturn(true);
         when(carRepository.existsCarByImmatriculation(carToPark.getImmatriculation())).thenReturn(false);
         when(parkingRepository.getOne(parkingId)).thenReturn(savedParking);
 
