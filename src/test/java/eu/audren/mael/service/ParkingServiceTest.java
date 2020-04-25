@@ -10,6 +10,9 @@ import eu.audren.mael.model.pricing.PerHoursPolicy;
 import eu.audren.mael.repository.BillRepository;
 import eu.audren.mael.repository.CarRepository;
 import eu.audren.mael.repository.ParkingRepository;
+import eu.audren.mael.repository.domain.BillEntity;
+import eu.audren.mael.repository.domain.CarEntity;
+import eu.audren.mael.repository.domain.ParkingEntity;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -17,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.*;
@@ -40,17 +44,27 @@ public class ParkingServiceTest {
     public void parkCarTest(){
         long parkingId = 1L;
         Car carToPark = new Car("immatriculation",parkingId,SlotType.STANDARDS);
-        Parking savedParking = new Parking(parkingId,1,1,1,new PerHoursPolicy(1));
+        ParkingEntity emptyParking = new ParkingEntity(parkingId,1,1,1,new PerHoursPolicy(1));
 
         Car parkedCar = new Car("immatriculation",parkingId,SlotType.STANDARDS);
-        parkedCar.setParkingUsed(savedParking);
+        parkedCar.setParkingUsed(new Parking(emptyParking));
 
+        CarEntity carEntity = new CarEntity(parkedCar,emptyParking);
+
+        ParkingEntity usedParking = new ParkingEntity(parkingId,1,1,1,new PerHoursPolicy(1));
+        usedParking.getElectricSlots50KwUsed().add(carEntity);
+
+        CarEntity parkedCarEntity = new CarEntity(parkedCar,usedParking);
+
+        when(parkingRepository.findById(parkingId)).thenReturn(Optional.of(emptyParking));
         when(parkingRepository.existsById(parkingId)).thenReturn(true);
+        when(parkingRepository.save(usedParking)).thenReturn(usedParking);
+
         when(carRepository.existsCarByImmatriculation(carToPark.getImmatriculation())).thenReturn(false);
-        when(parkingRepository.getOne(parkingId)).thenReturn(savedParking);
-        when(carRepository.save(parkedCar)).thenReturn(parkedCar);
+        when(carRepository.save(parkedCarEntity)).thenReturn(parkedCarEntity);
 
         Car savedCar = parkingService.parkCar(carToPark);
+
         assertThat(savedCar.getArrivalTime()).isNotEqualTo(0L);
         assertThat(savedCar.getParkingId()).isEqualTo(parkingId);
         assertThat(savedCar.getImmatriculation()).isEqualTo(carToPark.getImmatriculation());
@@ -66,8 +80,8 @@ public class ParkingServiceTest {
         String immatriculation = "immatriculation";
         long parkingId = 1L;
         long arrivalTime = 0L;
-        Parking savedParking = new Parking(parkingId,1,1,1,new PerHoursPolicy(1));
-        Car parkedCar = new Car(immatriculation ,SlotType.ELECTRIC_50KW, savedParking, arrivalTime,0L);
+        ParkingEntity savedParking = new ParkingEntity(parkingId,1,1,1,new PerHoursPolicy(1));
+        CarEntity parkedCar = new CarEntity(immatriculation ,SlotType.ELECTRIC_50KW, arrivalTime, savedParking);
 
         when(carRepository.existsCarByImmatriculation(immatriculation)).thenReturn(true);
         when(carRepository.findOneByImmatriculation(immatriculation)).thenReturn(parkedCar);
@@ -81,7 +95,7 @@ public class ParkingServiceTest {
         assertThat(leavingCar.getDepartureTime()).isNotEqualTo(0L);
         assertThat(leavingCar.getBill()).isNotWithin(0.1f).of(0f);
 
-        verify(billRepository,times(1)).save(new Bill(parkedCar));
+        verify(billRepository,times(1)).save(new BillEntity(new Car(parkedCar)));
 
     }
 
@@ -112,14 +126,14 @@ public class ParkingServiceTest {
     public void testThatCarDoNotParkWhenAllSlotsAreTaken(){
         long parkingId = 1L;
         Car carToPark = new Car("immatriculation",parkingId,SlotType.ELECTRIC_50KW);
-        Parking savedParking = new Parking(parkingId,1,1,0,new PerHoursPolicy(1));
+        ParkingEntity savedParking = new ParkingEntity(parkingId,1,1,0,new PerHoursPolicy(1));
 
         Car parkedCar = new Car("immatriculation",parkingId,SlotType.STANDARDS);
-        parkedCar.setParkingUsed(savedParking);
+        parkedCar.setParkingUsed(new Parking(savedParking));
 
         when(parkingRepository.existsById(parkingId)).thenReturn(true);
         when(carRepository.existsCarByImmatriculation(carToPark.getImmatriculation())).thenReturn(false);
-        when(parkingRepository.getOne(parkingId)).thenReturn(savedParking);
+        when(parkingRepository.findById(parkingId)).thenReturn(Optional.of(savedParking));
 
         parkingService.parkCar(carToPark);
     }

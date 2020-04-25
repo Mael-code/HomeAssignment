@@ -3,6 +3,7 @@ package eu.audren.mael.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import eu.audren.mael.repository.domain.CarEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,28 +14,19 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "immatriculation")
-@Entity(name = "CAR")
-@Table(name = "CAR")
 public class Car {
 
     @JsonProperty
-    @Id
-    @Column(name = "IMMATRICULATION")
     private String immatriculation;
 
     @JsonProperty
-    @Column(name = "SLOT_TYPE")
-    @Enumerated(EnumType.STRING)
     private SlotType slotType;
 
     @Setter
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "CAR_IMMATRICULATION")
     private Parking parkingUsed;
 
     @JsonProperty
-    @Column(name = "ARRIVAL_TIME")
     private long arrivalTime;
 
     @Setter
@@ -49,12 +41,15 @@ public class Car {
         this.arrivalTime = System.currentTimeMillis();
     }
 
-    public Car(String immatriculation, SlotType slotType, Parking parking, long arrivalTime, long departureTime) {
+    public Car(String immatriculation){
         this.immatriculation = immatriculation;
-        this.slotType = slotType;
-        this.parkingUsed = parking;
-        this.arrivalTime = arrivalTime;
-        this.departureTime = departureTime;
+    }
+
+    public Car(CarEntity carEntity){
+        this.immatriculation = carEntity.getImmatriculation();
+        this.arrivalTime = carEntity.getArrivalTime();
+        this.slotType = carEntity.getSlotType();
+        this.parkingUsed = new Parking(carEntity.getParkingUsed());
     }
 
     @JsonProperty(value = "parkingId")

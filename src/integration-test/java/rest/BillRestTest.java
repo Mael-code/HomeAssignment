@@ -10,6 +10,7 @@ import eu.audren.mael.model.pricing.PerHoursPolicy;
 import eu.audren.mael.repository.BillRepository;
 import eu.audren.mael.repository.CarRepository;
 import eu.audren.mael.repository.ParkingRepository;
+import eu.audren.mael.repository.domain.ParkingEntity;
 import eu.audren.mael.rest.BillRest;
 import eu.audren.mael.rest.CarRest;
 import org.junit.Before;
@@ -51,22 +52,22 @@ public class BillRestTest {
     @Autowired
     private BillRest billRest;
 
-    private Parking parking;
+    private ParkingEntity parkingEntity;
 
     @Before
     public void cleanDatabase(){
         parkingRepository.deleteAll();
         carRepository.deleteAll();
         billRepository.deleteAll();
-        parking = new Parking(1,1,1, new PerHoursPolicy(60*60*100));
-        parking = parkingRepository.save(parking);
+        parkingEntity = new ParkingEntity(1L,1,1,1, new PerHoursPolicy(60*60*100));
+        parkingEntity = parkingRepository.save(parkingEntity);
     }
 
 
     @Test
     public void getBillTest() {
         String immatriculation = "immatriculation";
-        Car car = new Car(immatriculation,parking.getId(), SlotType.STANDARDS);
+        Car car = new Car(immatriculation,parkingEntity.getId(), SlotType.STANDARDS);
         carRest.parkCar(car);
         car = carRest.removeCar(immatriculation);
         List<Bill> bills = billRest.getAllBills();

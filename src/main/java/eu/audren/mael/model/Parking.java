@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.audren.mael.model.pricing.PricingPolicy;
+import eu.audren.mael.repository.domain.CarEntity;
+import eu.audren.mael.repository.domain.ParkingEntity;
 import lombok.*;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -12,6 +14,7 @@ import org.hibernate.type.SerializableToBlobType;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The parking representation contains the parking properties and the car parked
@@ -19,47 +22,33 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-@Entity(name = "PARKING")
-@Table(name = "PARKING")
 public class Parking {
 
     @JsonProperty
-    @Id
-    @Column(name="ID")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PARKING_SEQUENCE")
-    @SequenceGenerator(name = "PARKING_SEQUENCE", sequenceName = "PARKING_SEQUENCE")
     private long id;
 
     @JsonProperty(required = true)
-    @Column(name = "STANDARDS_SLOTS")
     private int standardSlots;
 
     @JsonProperty(required = true)
-    @Column(name = "ELECTRIC_SLOTS_20KW")
     private int electricSlots20Kw;
 
     @JsonProperty(required = true)
-    @Column(name = "ELECTRIC_SLOTS_50KW")
     private int electricSlots50Kw;
 
     @JsonProperty(required = true)
-    @Column(name = "PRICING_POLICY")
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     private PricingPolicy pricingPolicy;
 
     @JsonIgnore
     @Setter
-    @OneToMany(mappedBy = "immatriculation", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<Car> standardsSlotsUsed;
 
     @JsonIgnore
     @Setter
-    @OneToMany(mappedBy = "immatriculation", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<Car> electricSlots20KwUsed;
 
     @JsonIgnore
     @Setter
-    @OneToMany(mappedBy = "immatriculation", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<Car> electricSlots50KwUsed;
 
     @JsonCreator
@@ -84,7 +73,25 @@ public class Parking {
         this.id = id;
     }
 
+    public Parking(ParkingEntity parkingEntity){
+        this.id = parkingEntity.getId();
+        this.electricSlots20Kw = parkingEntity.getElectricSlots20Kw();
+        this.electricSlots50Kw = parkingEntity.getElectricSlots50Kw();
+        this.pricingPolicy = parkingEntity.getPricingPolicy();
+        this.standardsSlotsUsed = convertCarEntity(parkingEntity.getStandardsSlotsUsed());
+        this.electricSlots20KwUsed = convertCarEntity(parkingEntity.getElectricSlots20KwUsed());
+        this.electricSlots50KwUsed = convertCarEntity(parkingEntity.getElectricSlots50KwUsed());
+    }
+
     public Parking(long id){
         this.id = id;
+    }
+
+    private List<Car> convertCarEntity(List<CarEntity> carEntities){
+        if (carEntities.isEmpty()){
+            return new ArrayList<>(0);
+        }else {
+            return carEntities.stream().map(carEntity -> new Car(carEntity.getImmatriculation())).collect(Collectors.toList());
+        }
     }
 }

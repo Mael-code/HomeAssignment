@@ -3,19 +3,21 @@ package eu.audren.mael.service;
 import eu.audren.mael.exception.DuplicateCarException;
 import eu.audren.mael.exception.ResourceNotFound;
 import eu.audren.mael.exception.ServerException;
-import eu.audren.mael.model.Bill;
 import eu.audren.mael.model.Car;
 import eu.audren.mael.model.Parking;
 import eu.audren.mael.model.SlotType;
 import eu.audren.mael.repository.BillRepository;
 import eu.audren.mael.repository.CarRepository;
 import eu.audren.mael.repository.ParkingRepository;
+import eu.audren.mael.repository.domain.BillEntity;
+import eu.audren.mael.repository.domain.CarEntity;
+import eu.audren.mael.repository.domain.ParkingEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ParkingService {
@@ -35,7 +37,7 @@ public class ParkingService {
      * @return the created parking
      */
     public Parking createParking(Parking newParking){
-        return parkingRepository.save(newParking);
+        return new Parking(parkingRepository.save(new ParkingEntity(newParking)));
     }
 
     /**
@@ -43,7 +45,7 @@ public class ParkingService {
      * @return the list of created parking
      */
     public List<Parking> getAllParking(){
-        return parkingRepository.findAll();
+        return parkingRepository.findAll().stream().map(Parking::new).collect(Collectors.toList());
     }
 
     /**
@@ -77,39 +79,53 @@ public class ParkingService {
     @Transactional
     public Car leaveSlot(String immatriculation){
         checkThatCarIsParked(immatriculation);
-        Car car = carRepository.findOneByImmatriculation(immatriculation);
+        CarEntity carEntity = carRepository.findOneByImmatriculation(immatriculation);
+        Car car = new Car(carEntity);
+
         carRepository.deleteByImmatriculation(immatriculation);
         car.setDepartureTime(System.currentTimeMillis());
-        billRepository.save(new Bill(car));
+        billRepository.save(new BillEntity(car));
         return car;
     }
 
     private Parking deleteParkingInRepository(long id){
-        Parking parkingToDelete = parkingRepository.getOne(id);
+        Parking parkingToDelete = getParkingIfExist(id);
         parkingRepository.deleteById(id);
         return parkingToDelete;
     }
 
     private Car parkCarInRepository(Car car){
-        Parking parking = parkingRepository.getOne(car.getParkingId());
-        checkRemainingSlots(parking,car);
-        car.setParkingUsed(parking);
-        car = carRepository.save(car);
-        getParkingSlots(parking,car.getSlotType()).add(car);
-        parkingRepository.save(parking);
-        return car;
+        long parkingId = car.getParkingId();
+
+        ParkingEntity parkingEntity =  parkingRepository.findById(car.getParkingId())
+                .orElseThrow(() ->new ResourceNotFound(String.format("Parking with the id %d is not found",parkingId)));
+        checkRemainingSlots(parkingEntity,car);
+
+        CarEntity carEntity = carRepository.save(new CarEntity(car, parkingEntity));
+        updateParkingSlots(parkingEntity,carEntity);
+        carEntity.setParkingUsed(parkingEntity);
+        parkingRepository.save(parkingEntity);
+        return new Car(carEntity);
     }
 
-    private List<Car> getParkingSlots(Parking parking, SlotType slotType){
-        switch (slotType){
+    private Parking getParkingIfExist(long id){
+        return parkingRepository.findById(id).map(Parking::new)
+                .orElseThrow(() ->new ResourceNotFound(String.format("Parking with the id %d is not found",id)));
+    }
+
+    private void updateParkingSlots(ParkingEntity parking, CarEntity carEntity){
+        switch (carEntity.getSlotType()){
             case STANDARDS:
-                return parking.getStandardsSlotsUsed();
+                parking.getStandardsSlotsUsed().add(carEntity);
+                break;
             case ELECTRIC_20KW:
-                return parking.getElectricSlots20KwUsed();
+                parking.getElectricSlots20KwUsed().add(carEntity);
+                break;
             case ELECTRIC_50KW:
-                return parking.getElectricSlots50KwUsed();
+                parking.getElectricSlots50KwUsed().add(carEntity);
+                break;
             default:
-                throw new ServerException(String.format("The slot type %s is unknown",slotType.name()));
+                throw new ServerException(String.format("The slot type %s is unknown",carEntity.getSlotType().name()));
         }
     }
 
@@ -131,7 +147,7 @@ public class ParkingService {
         }
     }
 
-    private void checkRemainingSlots(Parking parking, Car car){
+    private void checkRemainingSlots(ParkingEntity parking, Car car){
         int slotsUsed;
         int slotNumber;
         switch (car.getSlotType()){

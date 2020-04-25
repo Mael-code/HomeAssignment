@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/bill/")
@@ -23,6 +24,6 @@ public class BillRest {
      */
     @RequestMapping(method = RequestMethod.GET)
     public List<Bill> getAllBills(){
-        return billRepository.findAll();
+        return billRepository.findAll().stream().map(Bill::new).collect(Collectors.toList());
     }
 }
