@@ -22,6 +22,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
@@ -61,20 +63,66 @@ public class BillRestTest {
 
 
     @Test
-    public void getBillTest() {
-        String immatriculation = "immatriculation";
-        Car car = new Car(immatriculation, parkingEntity.getId(), SlotType.STANDARDS);
-        carRest.parkCar(car);
-        car = carRest.removeCar(immatriculation);
-        List<Bill> bills = billRest.getAllBills();
+    public void getAllBillsTest() {
+        Car car = parkThenRemoveCar("immatriculation", SlotType.STANDARDS);
+        List<Bill> bills = billRest.getAllBills(Optional.empty(), Optional.empty());
         assertThat(bills).hasSize(1);
         Bill carBill = bills.get(0);
         assertThat(carBill.getId()).isNotNull();
-        assertThat(carBill.getCarImmatriculation()).isEqualTo(car.getImmatriculation());
-        assertThat(carBill.getArrivalTime()).isEqualTo(car.getArrivalTime());
-        assertThat(carBill.getDepartureTime()).isEqualTo(car.getDepartureTime());
-        assertThat(carBill.getParkingId()).isEqualTo(car.getParkingId());
-        assertThat(carBill.getSlotType()).isEquivalentAccordingToCompareTo(car.getSlotType());
-        assertThat(carBill.getPrice()).isWithin(0.001f).of(car.getBill());
+        assertThatBillHaveTheSameValueThanTheCar(carBill, car);
+    }
+
+    @Test
+    public void getBillsWithPaginationTest() {
+        Car car1 = parkThenRemoveCar("immatriculation1", SlotType.STANDARDS);
+        Car car2 = parkThenRemoveCar("immatriculation2", SlotType.ELECTRIC_20KW);
+        Car car3 = parkThenRemoveCar("immatriculation3", SlotType.ELECTRIC_50KW);
+
+        List<Bill> bills = billRest.getAllBills(Optional.empty(), Optional.of(2));
+        assertThat(bills).hasSize(2);
+        assertThat(bills.stream().map(Bill::getCarImmatriculation).collect(Collectors.toList()))
+                .containsExactly(car1.getImmatriculation(), car2.getImmatriculation());
+
+        bills = billRest.getAllBills(Optional.of(1), Optional.of(2));
+        assertThat(bills).hasSize(1);
+        assertThat(bills.stream().map(Bill::getCarImmatriculation).collect(Collectors.toList()))
+                .containsExactly(car3.getImmatriculation());
+
+        assertThat(billRest.getAllBills(Optional.of(1), Optional.of(4))).isEmpty();
+
+        bills = billRest.getAllBills(Optional.of(0), Optional.of(4));
+        assertThat(bills).hasSize(3);
+        assertThat(bills.stream().map(Bill::getCarImmatriculation).collect(Collectors.toList()))
+                .containsExactly(car1.getImmatriculation(), car2.getImmatriculation(), car3.getImmatriculation());
+
+        Bill firstCarBill = getFirstCarBillFromCarImmatriculation(bills, car1);
+        Bill secondCarBill = getFirstCarBillFromCarImmatriculation(bills, car2);
+        Bill thirdCarBill = getFirstCarBillFromCarImmatriculation(bills, car3);
+
+        assertThatBillHaveTheSameValueThanTheCar(firstCarBill, car1);
+        assertThatBillHaveTheSameValueThanTheCar(secondCarBill, car2);
+        assertThatBillHaveTheSameValueThanTheCar(thirdCarBill, car3);
+    }
+
+    private Car parkThenRemoveCar(String immatriculation, SlotType slotType) {
+        Car car = new Car(immatriculation, parkingEntity.getId(), slotType);
+        carRest.parkCar(car);
+        return carRest.removeCar(immatriculation);
+    }
+
+    private Bill getFirstCarBillFromCarImmatriculation(List<Bill> bills, Car car) {
+        return bills.stream()
+                .filter(bill -> bill.getCarImmatriculation().equals(car.getImmatriculation()))
+                .findFirst().get();
+    }
+
+    private void assertThatBillHaveTheSameValueThanTheCar(Bill bill, Car car) {
+        final float tolerance = 0.001f;
+        assertThat(bill.getPrice()).isWithin(tolerance).of(car.getBill());
+        assertThat(bill.getCarImmatriculation()).isEqualTo(car.getImmatriculation());
+        assertThat(bill.getParkingId()).isEqualTo(car.getParkingId());
+        assertThat(bill.getArrivalTime()).isEqualTo(car.getArrivalTime());
+        assertThat(bill.getDepartureTime()).isEqualTo(car.getDepartureTime());
+        assertThat(bill.getSlotType()).isEquivalentAccordingToCompareTo(car.getSlotType());
     }
 }

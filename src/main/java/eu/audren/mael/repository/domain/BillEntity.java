@@ -2,6 +2,7 @@ package eu.audren.mael.repository.domain;
 
 import eu.audren.mael.model.Car;
 import eu.audren.mael.model.SlotType;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,13 +11,14 @@ import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Entity(name = "BILL")
 @Table(name = "BILL")
 public class BillEntity {
 
     @Id
-    @Column(name="ID")
+    @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "BILL_SEQUENCE")
     @SequenceGenerator(name = "BILL_SEQUENCE", sequenceName = "BILL_SEQUENCE")
     private long id;
@@ -40,7 +42,7 @@ public class BillEntity {
     @Enumerated(EnumType.STRING)
     private SlotType slotType;
 
-    public BillEntity(Car car){
+    public BillEntity(Car car) {
         this.price = car.getBill();
         this.carImmatriculation = car.getImmatriculation();
         this.parkingId = car.getParkingId();
