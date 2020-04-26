@@ -5,17 +5,20 @@ import eu.audren.mael.model.Parking;
 import eu.audren.mael.model.SlotType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Getter
+@NoArgsConstructor
 @EqualsAndHashCode(of = "immatriculation")
 @Entity(name = "CAR")
 @Table(name = "CAR")
 public class CarEntity implements Serializable {
 
+    @Id
     @Column(name = "IMMATRICULATION")
     private String immatriculation;
 

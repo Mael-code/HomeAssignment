@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -99,10 +100,33 @@ public class ParkingServiceTest {
 
     }
 
+    @Test
+    public void deleteParkingTest(){
+        long parkingId = 1L;
+        ParkingEntity parkingEntity = new ParkingEntity(parkingId,1,2,3, new PerHoursPolicy(2));
+        CarEntity carEntity = new CarEntity("immatriculation",SlotType.STANDARDS,10L,parkingEntity);
+        parkingEntity.setStandardsSlotsUsed(Collections.singletonList(carEntity));
+
+        when(parkingRepository.findById(parkingId)).thenReturn(Optional.of(parkingEntity));
+
+        Parking removedParking = parkingService.deleteParking(parkingId);
+
+        assertThat(removedParking.getId()).isEqualTo(1L);
+        assertThat(removedParking.getStandardSlots()).isEqualTo(1);
+        assertThat(removedParking.getElectricSlots20Kw()).isEqualTo(2);
+        assertThat(removedParking.getElectricSlots50Kw()).isEqualTo(3);
+        assertThat(removedParking.getStandardsSlotsUsed()).hasSize(1);
+        assertThat(removedParking.getStandardsSlotsUsed().get(0).getImmatriculation()).isEqualTo(carEntity.getImmatriculation());
+        assertThat(removedParking.getElectricSlots20KwUsed()).hasSize(0);
+        assertThat(removedParking.getElectricSlots50KwUsed()).hasSize(0);
+
+        verify(parkingRepository,times(1)).deleteById(parkingId);
+    }
+
     @Test(expected = ResourceNotFound.class)
     public void deleteParkingWithBadId(){
         long badId = 1;
-        when(parkingRepository.existsById(badId)).thenReturn(false);
+        when(parkingRepository.findById(badId)).thenReturn(Optional.empty());
         parkingService.deleteParking(badId);
     }
 

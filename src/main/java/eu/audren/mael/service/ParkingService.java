@@ -55,8 +55,9 @@ public class ParkingService {
      */
     @Transactional
     public Parking deleteParking(long id){
-        checkThatParkingExists(id);
-        return deleteParkingInRepository(id);
+        Parking parkingToDelete = getParkingIfExist(id);
+        parkingRepository.deleteById(id);
+        return parkingToDelete;
     }
 
     /**
@@ -86,12 +87,6 @@ public class ParkingService {
         car.setDepartureTime(System.currentTimeMillis());
         billRepository.save(new BillEntity(car));
         return car;
-    }
-
-    private Parking deleteParkingInRepository(long id){
-        Parking parkingToDelete = getParkingIfExist(id);
-        parkingRepository.deleteById(id);
-        return parkingToDelete;
     }
 
     private Car parkCarInRepository(Car car){

@@ -4,6 +4,8 @@ import eu.audren.mael.model.Parking;
 import eu.audren.mael.model.pricing.PricingPolicy;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Entity(name = "PARKING")
 @Table(name = "PARKING")
@@ -40,13 +43,15 @@ public class ParkingEntity implements Serializable  {
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     private PricingPolicy pricingPolicy;
 
+    @Setter
     @OneToMany(mappedBy = "immatriculation", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<CarEntity> standardsSlotsUsed;
 
-
+    @Setter
     @OneToMany(mappedBy = "immatriculation", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<CarEntity> electricSlots20KwUsed;
 
+    @Setter
     @OneToMany(mappedBy = "immatriculation", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<CarEntity> electricSlots50KwUsed;
 

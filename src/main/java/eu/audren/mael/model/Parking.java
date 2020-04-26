@@ -75,6 +75,7 @@ public class Parking {
 
     public Parking(ParkingEntity parkingEntity){
         this.id = parkingEntity.getId();
+        this.standardSlots = parkingEntity.getStandardSlots();
         this.electricSlots20Kw = parkingEntity.getElectricSlots20Kw();
         this.electricSlots50Kw = parkingEntity.getElectricSlots50Kw();
         this.pricingPolicy = parkingEntity.getPricingPolicy();

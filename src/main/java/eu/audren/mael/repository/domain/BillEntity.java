@@ -4,10 +4,12 @@ import eu.audren.mael.model.Car;
 import eu.audren.mael.model.SlotType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Getter
+@NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Entity(name = "BILL")
 @Table(name = "BILL")
