@@ -3,10 +3,8 @@ package eu.audren.mael.rest;
 import eu.audren.mael.model.Bill;
 import eu.audren.mael.service.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +21,8 @@ public class BillRest {
      *
      * @return the list of all bills
      */
+
+    @ResponseStatus(HttpStatus.OK)
     @RequestMapping(method = RequestMethod.GET)
     public List<Bill> getAllBills(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> numberOfBill) {
         return billService.retrieveBills(page, numberOfBill);

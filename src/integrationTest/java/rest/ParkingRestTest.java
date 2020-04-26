@@ -45,8 +45,7 @@ public class ParkingRestTest {
         final int electricSlots50Kw = 4;
         final PricingPolicy pricingPolicy = new PerHoursPolicy(5);
 
-        Parking newParking = new Parking(standardSlots, electricSlots20Kw, electricSlots50Kw, pricingPolicy);
-        Parking createdParking = parkingRest.createParking(newParking);
+        Parking createdParking = parkingRest.createParking(standardSlots, electricSlots20Kw, electricSlots50Kw, pricingPolicy);
         assertThat(createdParking).isNotNull();
         assertThat(createdParking.getId()).isNotNull();
         assertThat(createdParking.getStandardSlots()).isEqualTo(standardSlots);
@@ -62,7 +61,7 @@ public class ParkingRestTest {
         final int electricSlots50Kw = 4;
         final PricingPolicy pricingPolicy = new PerHoursPolicy(5);
 
-        Parking newParking = parkingRest.createParking(new Parking(standardSlots, electricSlots20Kw, electricSlots50Kw, pricingPolicy));
+        Parking newParking = parkingRest.createParking(standardSlots, electricSlots20Kw, electricSlots50Kw, pricingPolicy);
 
         Parking deletedParking = parkingRest.deleteParking(newParking.getId());
         assertThat(deletedParking.getId()).isEqualTo(newParking.getId());

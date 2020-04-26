@@ -52,8 +52,7 @@ public class CarRestTest {
     public void parkCarTest() {
         String immatriculation = "immatriculation";
         long before = System.currentTimeMillis();
-        Car car = new Car(immatriculation, parkingEntity.getId(), SlotType.STANDARDS);
-        car = carRest.parkCar(car);
+        Car car = carRest.parkCar(immatriculation, parkingEntity.getId(), SlotType.STANDARDS);
         long after = System.currentTimeMillis();
         assertThat(car.getSlotType()).isEquivalentAccordingToCompareTo(SlotType.STANDARDS);
         assertThat(car.getImmatriculation()).isEqualTo(immatriculation);
@@ -67,8 +66,7 @@ public class CarRestTest {
     public void leaveParkTest() throws Exception {
         String immatriculation = "immatriculation";
         long before = System.currentTimeMillis();
-        Car car = new Car(immatriculation, parkingEntity.getId(), SlotType.STANDARDS);
-        carRest.parkCar(car);
+        Car car = carRest.parkCar(immatriculation, parkingEntity.getId(), SlotType.STANDARDS);
         Thread.sleep(1000);
         car = carRest.removeCar(immatriculation);
         long after = System.currentTimeMillis();

@@ -54,16 +54,17 @@ public class Application extends WebMvcConfigurerAdapter {
     @Bean
     public Docket microserviceApi() {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo())
-                                                      .groupName("microservice-example")
+                                                      .groupName("HomeAssignment")
                                                       .select()
                                                       .paths(allowedPaths())
                                                       .build();
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title("Microservice example API")
-                                   .description("Microservice example in java")
+        return new ApiInfoBuilder().title("Home Assignment API")
+                                   .description("Home Assignment in java")
                                    .licenseUrl("https://github.com/Mael-code/HomeAssignment/blob/master/LICENSE")
+                                   .license("GNU License")
                                    .version("1.0")
                                    .build();
     }

@@ -60,11 +60,7 @@ public class ParkingEntity implements Serializable  {
         this.id = id;
     }
 
-    public ParkingEntity(Parking parking){
-        this(parking.getStandardSlots(), parking.getElectricSlots20Kw(), parking.getElectricSlots50Kw(), parking.getPricingPolicy());
-    }
-
-    private ParkingEntity(int standardSlots, int electricSlots20Kw, int electricSlots50Kw, PricingPolicy pricingPolicy) {
+    public ParkingEntity(int standardSlots, int electricSlots20Kw, int electricSlots50Kw, PricingPolicy pricingPolicy) {
         this.standardSlots = standardSlots;
         this.electricSlots20Kw = electricSlots20Kw;
         this.electricSlots50Kw = electricSlots50Kw;

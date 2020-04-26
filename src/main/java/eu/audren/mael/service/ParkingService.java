@@ -6,6 +6,7 @@ import eu.audren.mael.exception.ServerException;
 import eu.audren.mael.model.Car;
 import eu.audren.mael.model.Parking;
 import eu.audren.mael.model.SlotType;
+import eu.audren.mael.model.pricing.PricingPolicy;
 import eu.audren.mael.repository.BillRepository;
 import eu.audren.mael.repository.CarRepository;
 import eu.audren.mael.repository.ParkingRepository;
@@ -33,11 +34,14 @@ public class ParkingService {
 
     /**
      * Create a new Parking in the database
-     * @param newParking the parking that will be saved
+     *@param standardSlots number of parking standard slots
+     * @param electricSlots20Kw number of parking 20 KW electrics slots
+     * @param electricSlots50Kw number of parking 50 KW electrics slots
+     * @param pricingPolicy the policy used for this parking to compute the price when the car leave
      * @return the created parking
      */
-    public Parking createParking(Parking newParking){
-        return new Parking(parkingRepository.save(new ParkingEntity(newParking)));
+    public Parking createParking(int standardSlots, int electricSlots20Kw, int electricSlots50Kw, PricingPolicy pricingPolicy){
+        return new Parking(parkingRepository.save(new ParkingEntity(standardSlots,electricSlots20Kw,electricSlots50Kw,pricingPolicy)));
     }
 
     /**
@@ -62,14 +66,16 @@ public class ParkingService {
 
     /**
      * Park the car into a parking if it meets the requirements
-     * @param car is the car that will be parked
+     * @param immatriculation the car immatriculation
+     * @param parkingId the parking where the car intend to park
+     * @param slotType the kind of slot where the car will park
      * @return the persisted car
      */
     @Transactional
-    public Car parkCar(Car car){
-        checkThatParkingExists(car.getParkingId());
-        checkThatCarIsNotParked(car.getImmatriculation());
-        return parkCarInRepository(car);
+    public Car parkCar(String immatriculation,long parkingId, SlotType slotType){
+        checkThatParkingExists(parkingId);
+        checkThatCarIsNotParked(immatriculation);
+        return parkCarInRepository(immatriculation,parkingId,slotType);
     }
 
     /**
@@ -89,14 +95,13 @@ public class ParkingService {
         return car;
     }
 
-    private Car parkCarInRepository(Car car){
-        long parkingId = car.getParkingId();
+    private Car parkCarInRepository(String immatriculation,long parkingId,SlotType slotType){
 
-        ParkingEntity parkingEntity =  parkingRepository.findById(car.getParkingId())
+        ParkingEntity parkingEntity =  parkingRepository.findById(parkingId)
                 .orElseThrow(() ->new ResourceNotFound(String.format("Parking with the id %d is not found",parkingId)));
-        checkRemainingSlots(parkingEntity,car);
+        checkRemainingSlots(parkingEntity,slotType);
 
-        CarEntity carEntity = carRepository.save(new CarEntity(car, parkingEntity));
+        CarEntity carEntity = carRepository.save(new CarEntity(immatriculation,slotType,System.currentTimeMillis(), parkingEntity));
         updateParkingSlots(parkingEntity,carEntity);
         carEntity.setParkingUsed(parkingEntity);
         parkingRepository.save(parkingEntity);
@@ -142,10 +147,10 @@ public class ParkingService {
         }
     }
 
-    private void checkRemainingSlots(ParkingEntity parking, Car car){
+    private void checkRemainingSlots(ParkingEntity parking, SlotType slotType){
         int slotsUsed;
         int slotNumber;
-        switch (car.getSlotType()){
+        switch (slotType){
             case STANDARDS:
                 slotsUsed = parking.getStandardsSlotsUsed().size();
                 slotNumber = parking.getStandardSlots();
@@ -159,11 +164,11 @@ public class ParkingService {
                 slotNumber = parking.getElectricSlots50Kw();
                 break;
             default:
-                throw new ServerException(String.format("The slot type %s is unknown",car.getSlotType().name()));
+                throw new ServerException(String.format("The slot type %s is unknown",slotType.name()));
         }
         if (slotsUsed>=slotNumber){
             throw new DuplicateCarException(String.format("Slots %s are not available anymore for the parking %s",
-                    car.getSlotType().name(),
+                    slotType.name(),
                     parking.getId()));
         }
 

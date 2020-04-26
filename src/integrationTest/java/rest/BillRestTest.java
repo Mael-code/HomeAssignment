@@ -105,8 +105,7 @@ public class BillRestTest {
     }
 
     private Car parkThenRemoveCar(String immatriculation, SlotType slotType) {
-        Car car = new Car(immatriculation, parkingEntity.getId(), slotType);
-        carRest.parkCar(car);
+        carRest.parkCar(immatriculation, parkingEntity.getId(), slotType);
         return carRest.removeCar(immatriculation);
     }
 

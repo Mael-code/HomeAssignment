@@ -106,6 +106,8 @@ def integrationTest = tasks.register('integrationTest', Test) {
     shouldRunAfter('test')
 }
 
+build.dependsOn integrationTest
+
 jacocoTestReport {
     executionData test
 
