@@ -21,6 +21,7 @@ public class ExceptionHandlerAdvice {
 
     /**
      * Automatically catch client exception thrown and return a client error to the user
+     *
      * @param exception is the exception caught
      * @return Response entity containing the http status code and the error message
      * @throws Exception is thrown if the annotation status cannot be solved
@@ -38,6 +39,7 @@ public class ExceptionHandlerAdvice {
 
     /**
      * Automatically catch unhandled exceptions and return a server error to the user
+     *
      * @param e the exception caught
      * @return a server error
      */

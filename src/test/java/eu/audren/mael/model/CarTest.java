@@ -12,22 +12,22 @@ public class CarTest {
     private Car car;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         PricingPolicy pricingPolicy = new PerHoursPolicy(1);
-        Parking parking = new Parking(1,1,1,pricingPolicy);
-        car =  new Car("",1,null);
+        Parking parking = new Parking(1, 1, 1, pricingPolicy);
+        car = new Car("", 1, null);
         car.setParkingUsed(parking);
     }
 
     @Test
-    public void getBillWithoutDepartureTest(){
+    public void getBillWithoutDepartureTest() {
         assertThat(car.getBill()).isWithin(new Float(0.001)).of(0);
     }
 
     @Test
-    public void getBillWithDepartureTest(){
-        final long twoHourAndHalf = 1000*60*60*2+30*60*1000;
-        car.setDepartureTime(car.getArrivalTime()+twoHourAndHalf);
+    public void getBillWithDepartureTest() {
+        final long twoHourAndHalf = 1000 * 60 * 60 * 2 + 30 * 60 * 1000;
+        car.setDepartureTime(car.getArrivalTime() + twoHourAndHalf);
         assertThat(car.getBill()).isWithin(new Float(0.001)).of(new Float(2.5));
     }
 }

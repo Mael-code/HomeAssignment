@@ -65,7 +65,7 @@ public class ParkingServiceTest {
         when(carRepository.existsCarByImmatriculation(carToPark.getImmatriculation())).thenReturn(false);
         when(carRepository.save(parkedCarEntity)).thenReturn(parkedCarEntity);
 
-        Car savedCar = parkingService.parkCar(immatriculation,parkingId,slotType);
+        Car savedCar = parkingService.parkCar(immatriculation, parkingId, slotType);
 
         assertThat(savedCar.getArrivalTime()).isNotEqualTo(0L);
         assertThat(savedCar.getParkingId()).isEqualTo(parkingId);
@@ -162,7 +162,7 @@ public class ParkingServiceTest {
         when(carRepository.existsCarByImmatriculation(carToPark.getImmatriculation())).thenReturn(false);
         when(parkingRepository.findById(parkingId)).thenReturn(Optional.of(savedParking));
 
-        parkingService.parkCar(immatriculation,parkingId,slotType);
+        parkingService.parkCar(immatriculation, parkingId, slotType);
     }
 
 }

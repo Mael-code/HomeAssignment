@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @ResponseStatus(HttpStatus.CONFLICT)
 public class DuplicateCarException extends ClientException {
-    public DuplicateCarException(String errorMessage){
+    public DuplicateCarException(String errorMessage) {
         super(errorMessage);
     }
 }

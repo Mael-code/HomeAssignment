@@ -1,6 +1,5 @@
 package eu.audren.mael.repository.domain;
 
-import eu.audren.mael.model.Parking;
 import eu.audren.mael.model.pricing.PricingPolicy;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -20,10 +19,10 @@ import java.util.List;
 @EqualsAndHashCode(of = "id")
 @Entity(name = "PARKING")
 @Table(name = "PARKING")
-public class ParkingEntity implements Serializable  {
+public class ParkingEntity implements Serializable {
 
     @Id
-    @Column(name="ID")
+    @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PARKING_SEQUENCE")
     @SequenceGenerator(name = "PARKING_SEQUENCE", sequenceName = "PARKING_SEQUENCE")
     private long id;
@@ -55,7 +54,7 @@ public class ParkingEntity implements Serializable  {
     @OneToMany(mappedBy = "immatriculation", orphanRemoval = true, cascade = CascadeType.REMOVE)
     private List<CarEntity> electricSlots50KwUsed;
 
-    public ParkingEntity(long id, int standardSlots, int electricSlots20Kw, int electricSlots50Kw, PricingPolicy pricingPolicy){
+    public ParkingEntity(long id, int standardSlots, int electricSlots20Kw, int electricSlots50Kw, PricingPolicy pricingPolicy) {
         this(standardSlots, electricSlots20Kw, electricSlots50Kw, pricingPolicy);
         this.id = id;
     }

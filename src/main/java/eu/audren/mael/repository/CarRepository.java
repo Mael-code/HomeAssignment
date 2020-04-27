@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CarRepository extends JpaRepository<CarEntity,Long> {
+public interface CarRepository extends JpaRepository<CarEntity, Long> {
 
     CarEntity findOneByImmatriculation(String immatriculation);
 

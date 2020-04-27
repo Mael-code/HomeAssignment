@@ -15,7 +15,7 @@ public class JacksonSerializationTest {
     private ObjectMapper objectMapper;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         objectMapper = new ObjectMapper();
     }
 
@@ -29,7 +29,7 @@ public class JacksonSerializationTest {
 
     @Test
     public void fixedAmountPolicySerializationTest() throws Exception {
-        PricingPolicy fixedAmountPolicy= new FixedAmountPolicy(5,1);
+        PricingPolicy fixedAmountPolicy = new FixedAmountPolicy(5, 1);
         String result = objectMapper.writeValueAsString(fixedAmountPolicy);
         PricingPolicy perHoursPolicy1 = objectMapper.readerFor(PricingPolicy.class).readValue(result);
         assertThat(perHoursPolicy1.getPricing(2)).isWithin(0.001f).of(7f);
@@ -38,7 +38,7 @@ public class JacksonSerializationTest {
     @Test
     public void parkingSerializationTest() throws Exception {
         PricingPolicy perHoursPolicy = new PerHoursPolicy(2);
-        Parking parking = new Parking(1,2,3,perHoursPolicy);
+        Parking parking = new Parking(1, 2, 3, perHoursPolicy);
         String parkingJson = "{\"standardSlots\":1,\"electricSlots20Kw\":2,\"electricSlots50Kw\":3,\"pricingPolicy\":{\"policy\":\"perHours\",\"hourPrice\":2}}";
         Parking deserializedParking = objectMapper.readerFor(Parking.class).readValue(parkingJson);
         assertThat(deserializedParking.getId()).isEqualTo(parking.getId());

@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.audren.mael.repository.domain.BillEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 /**
  * The bill representation contains all the payment information
@@ -36,7 +33,7 @@ public class Bill {
     @JsonProperty
     private SlotType slotType;
 
-    public Bill(float price, String carImmatriculation, long parkingId, long arrivalTime, long departureTime, SlotType slotType){
+    public Bill(float price, String carImmatriculation, long parkingId, long arrivalTime, long departureTime, SlotType slotType) {
         this.price = price;
         this.carImmatriculation = carImmatriculation;
         this.parkingId = parkingId;
@@ -45,13 +42,13 @@ public class Bill {
         this.slotType = slotType;
     }
 
-    public Bill(BillEntity billEntity){
+    public Bill(BillEntity billEntity) {
         this(billEntity.getPrice(), billEntity.getCarImmatriculation(), billEntity.getParkingId(),
                 billEntity.getDepartureTime(), billEntity.getArrivalTime(), billEntity.getSlotType());
         this.id = billEntity.getId();
     }
 
-    public Bill(Car car){
+    public Bill(Car car) {
         this(car.getBill(), car.getImmatriculation(), car.getParkingId(),
                 car.getDepartureTime(), car.getArrivalTime(), car.getSlotType());
     }

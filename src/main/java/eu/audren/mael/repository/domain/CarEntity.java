@@ -1,7 +1,6 @@
 package eu.audren.mael.repository.domain;
 
 import eu.audren.mael.model.Car;
-import eu.audren.mael.model.Parking;
 import eu.audren.mael.model.SlotType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,7 +33,7 @@ public class CarEntity implements Serializable {
     @JoinColumn(name = "CAR_IMMATRICULATION")
     private ParkingEntity parkingUsed;
 
-    public CarEntity(String immatriculation, SlotType slotType, long arrivalTime, ParkingEntity parkingUsed){
+    public CarEntity(String immatriculation, SlotType slotType, long arrivalTime, ParkingEntity parkingUsed) {
         this.immatriculation = immatriculation;
         this.slotType = slotType;
         this.arrivalTime = arrivalTime;
@@ -42,7 +41,7 @@ public class CarEntity implements Serializable {
 
     }
 
-    public CarEntity(Car car, ParkingEntity parkingEntity){
+    public CarEntity(Car car, ParkingEntity parkingEntity) {
         this(car.getImmatriculation(), car.getSlotType(), car.getArrivalTime(), parkingEntity);
     }
 }
