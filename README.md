@@ -53,3 +53,6 @@ File -> Settings -> Plugins -> Search for `Lombok` and install it
 In order to activate the annotation processing:
 Files -> Settings -> Build, Execution, Deployment, -> Compiler -> Annotation processorts -> Select `Enable annotation processing`
 
+### Create a PricingPolicy object
+Swagger documentation is not able to describe the PricingPolicy models.
+In order to create a PricingPolicy object, please have a look to the following issue [https://github.com/Mael-code/HomeAssignment/issues/2](https://github.com/Mael-code/HomeAssignment/issues/2)
